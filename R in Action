@@ -1,0 +1,263 @@
+http://cran.r-project.org
+统计计算和绘图
+解释型语言
+区分大小写 
+
+赋值 <-  or ->
+向量赋值函数 :c() eg. age <- c(1,3,4)
+
+R绘制的图形:demo()
+
+help.start()
+help("foo") or ?foo
+help.search("foo") or ??foo
+example("foo")
+RSiteSearch("foo")
+vignette() vignette("foo")
+
+工作空间（可保存）workspace:存储用户定义对象：向量 矩阵 函数 数据框 列表 
+getwd() 当前目录
+setwd("") 设定当前你也可以
+load(工作空间)
+\转义字符   c:/m/
+
+输入：source("filename") 
+文本输出：sink("filename") 参数append spilt=TRUE: 同时输出到屏幕和文件
+图形输出：最后使用dev.off()将输出返回终端
+pdf("")
+win.metafile("")
+png("")
+jpeg("")
+bmp("")
+postscript("")
+
+包
+R自带包 base datasets utils grDevices graphics stats methods
+library() 查看包
+函数.libPaths()
+install.packages()
+update.packages()
+installed.packages()
+serach():那些包已加载可使用
+包下载->library(包)载入包
+help(package="package_name")
+
+创建数据集
+1.数据结构： 量 因子 矩阵 数据框 列表
+2.导入数据到数据结构
+行： 观测 列： 变量
+R可处理数据：数值（包括日期类型） 字符 逻辑（TRUE FALSE） 复数 原生型（字节）
+向量：1维 数值 字符 逻辑   相同数据类型 标量是只含一个元素的向量 c()  vector_name[3] vector_name[c(2,4)] vector_name[2:6]
+矩阵：2维 数值 字符 逻辑   matrix(vector,nrow=4,ncol=4,byrow=TURE,dimnames=list(rnames,cnames)) x[2,] x[1,4] x[1,c(4,5)]
+数组：array(vctor, dimensions, dimnames)  arry(1:24,c(2,3,4),dimnames=list(dim1,dim2,dim3)) dim1<-c("A1","A2")
+数据框:列数据模式唯一 data.frame(patientID,age,diabetes,status[,row.names=patientID]) patientdata[1:2] patientdata[c("diabetes","status")]  row.names指定实例标识符
+      变量patientdata$age table(patientdata$diabetes,patientdata$status)
+      attach(patientdata) 将数据框加入R搜索路径
+      plot(age,status)
+      detach()            移除
+      with(patientdata,{    名称相同的对象不止一个
+        plot(age,status)
+        temp<-sumary(age,status)   赋值仅在此括号内生效
+        temps<<-sumary(age,status) 全局变量
+      }) 
+
+因子(factor)：名义型和有序型变量 决定数据分析方式和视觉呈现方式 不再是数值而是符号
+    变量可归结为 名义型 有序性 连续型变量
+    名义型：没有顺序之分的类别变量
+    有序型：顺序，非数量关系
+    连续性：顺序和数量
+
+    factor()以一个整数向量的形式存储类别值  因子水平默认依字母顺序创建 
+    status<-c("Poor","Improved","Excellent","Poor")
+    status<-factor(status)               名义型变量
+    status<-factor(status,ordered=TRUE)  有序型变量  将向量编码为（3,2,1,3） 内部关联值为1=Excellent.... 
+    status<-factor(status,ordered=TRUE, levels=c("Poor","Improved","Excellent"))  指定顺序
+列表：对象的有序集合 list()
+     list(name1=object1,names=object2) 指定名称
+     mylist$name1 mylist[[3]] mylist[["name1"]]
+
+# 注释 if（FALSE）{....} 
+赋值给某个数据结构中不存在的一个元素时，R自动扩展数据结构
+
+数据输入：
+键盘： edit()  
+mydata <- data.frame(age=numeric(0),gender=character(0),weight=numeric(0)) 创建空数据框或矩阵
+mydata <- edit(mydata)   操作对象副本，因此需要赋值  等价简介写法fix(mydata)
+带分隔符的ASCII文本文件：read.table(file, header=TRUE/FALSE, sep=",",row.name="name")   file 可以是csv文件 返回数据框
+                       默认情况字符变量转变成因子 stringAsFactors=FALSE或使用选项 colClasses 为每一列指定类eg logical numeric character factor
+EXCEL:导入包 RODBC
+install.package("RODBC") 下载安装包
+library(RODBC) 载入包
+channel <- odbcConnectExecl("myfile.xls") 获取RODBC连接对象
+mydattafram <- sqlFetch(channel, "mysheet") 读取sheet
+odbcClose()
+XML：XML包
+网页抓取数据：readLines()下载网页 grep()gsub() 一类函数处理 或使用RCurl XML 包
+
+数据库管理系统：
+1.ODBC接口：RODBC包 ODBC前提是数据库拥有ODBC驱动，因此需要下载
+  odbcConnect(dns,uid="",pwd="")
+  sqlFetch(channel,sqltable)
+  sqlQuery（channel, query）
+  sqlSave(channel,mydf,tablename=sqltable,append=FALSE) 将数据框写入或更新（append=TRUE）到ODBC数据库的某个表中
+  sqlDrop(channel,sqtable)
+  close(channel)
+2.DBI相关包：基于DBI的包RJDBC RMySQL ROracleRPostgreSQL RSQLite
+
+通过Stat/Transfer 导入数据：商业软件
+
+.axis坐标轴刻度文字
+.lab 坐标轴
+.main 标题
+.sub 副标题
+修改图形参数：
+par(optionname=value,opeionname=name,)no.readonly=TRUE 可修改当前图形参数列表
+图形绘制时设定 plot(,,lty=2,pch=17) hist() boxplot()
+R中颜色的参数col fg bg    colors() 返回所有颜色名称 rainbow()
+文本属性cex（大小） font
+title(main="",sub="",xlab="",ylab="")
+axis()
+
+基本数据管理
+处理不完整数据，缺失值
+数据集的合并和子集
+重新编码
+
+%% 求余 5%%2=1
+%/% 整数除法 5%/%2=2
+
+按需创建变量并将其保存到数据框
+mydata$sumx <- mydata$x1 + mydata$x2 sumx是新变量
+mydata <- transform(mydata, sumx = x1+x2)
+变量重编码
+leadership <- data.frame(manager,date,country,gender,age,q1,q2,q3,q4,q5)
+1.leadership$age[leadership$age == 99] <- NA 重新编码缺失值 variable[condition] <- expression
+  leadership$agecut[leadership$age > 75] <-"Elder"
+2.leadership <- within(leadership,{               within() 与with() 相似，它允许修改数据框
+		     agecat <-NA   将每一行设置为缺失值
+		     agecat[age>75] <- "Elder"
+		     agecat[age>=55 & age <=75] <-"Middle Aged"
+		     agecat[age < 55] <-"Young"})
+变量重命名
+1.fix(leadership) 调用交互式编辑器
+2.reshape 包 rename(dataframe,c(oldname="newname",oldname="newname",...))
+3.names(leadership)[2] <-"testDate"  names(leadership)[2:6] <- c("","","",..)
+
+缺失值（Not Available） 不可能出现的值（Not a Number）NaN eg.被0除的结果
+is.na(对象) y<- c(1,2,3,NA) is.na(y) 返回 c(FALSE,FALSE,FALSE,TRUE)
+is.na(leadership[,6:10]) 限定到6-10列
+含有缺失值的算术表达式和函数计算结果也是缺失值 多数数值函数都有选项na.rm=TRUE 移除缺失值
+na.omit() 行删除：移除所有含有缺失值的观测
+
+日期值:字符串形式输入，数值形式存储 help(as.Date) help(strftime) help(ISOdatetime)日期格式
+字符串->日期 as.Date(x,"input_format") x是字符型数据 默认格式yyyy-mm-dd(%Y-%m-%d)
+input_format: %d(01`31)  %m(00~12) %y(07) %Y(2007) %a(Mon) %A(MOnday) %b(Jan) %B(January) 
+Sys.Date() 当天日期eg.2011-12-01  date（）当天日期和时间eg.Wed Dec 01 16:28:21 2010
+format(date(),format="%B %d %Y") 指定日期格式
+R 使用自1970年1月1日以来的天数表示的，更早的日期为负数，可以执行算术运算
+difftime(today,birth,units="weeks")
+日期->字符串 as.character(dates)
+
+类型判断 is.numeric() 数据转换 as.numeric()
+is.numeric()  is.character() is.logical()  
+is.vector() is.matrix() is.data.frame()is.factor()
+
+order() 对数据框排序
+newdata <-leadership[order(gender,-age)] 默认升序 age降序
+
+合并数据集
+merge(dataframeA,dataframeB,by=c("ID","Country")) 横向合并列增加 inner join  条件： 共同索引
+cbind(A,B) 与merge 不同没有公共索引    条件：需要A,B有相同的行数，顺序
+rind(dataframeA,dataframeB) 纵向合并行增加 条件：数据框拥有相同的变量，顺序不要求
+
+取子集
+选取变量
+1.newdata <- leadership[,c(6:10)] ,表示默认选择所有行
+2.myvars <- c("q1","q2","q3","q4","q5")
+  newdata <- leadership[myvars]
+3.myvars <- paste("q",1:5,sep="")
+ newdata <- leadership[myvars]
+丢弃变量
+1.myvars <- names(leadership) &in% c("q3","q4") 返回一个逻辑向量c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,TRUE,FALSE)
+  newdata <- leadership[!myvars]
+2.newdata <- leadership[c(-8,-9)]
+3.leadership$q3 <- leadership$4 <-NULL
+
+选取观测
+1.newdata <- leadership[1:3,]
+2.attach(leadership)
+  newdata <- leadership[which(gender=='M') & age>30] 返回c(1,4) which根据逻辑向量给出向量中值为TRUE的下标
+  detach(leadership)
+
+简单方法
+subset(leadership, gender='M' & age >25,select=gender:q4)
+subset(leadership, gender='M' & age >25,select=c(q1,q2,q3,q4))
+
+随机抽样
+sample()
+leadership[sample(1:nrow(leadership),3,replace=FALSE)] 取样范围，长度，无放回抽样
+sampling 包
+
+使用SQL语句操作数据框 sqldf包
+newdata <- sqldf("selec ManagerID,age from leadership where age>30 order by age")
+
+高级数据管理
+数学函数： x 可以使向量 矩阵 数据框
+abs(x)             |x|
+sqrt(x)            平方根
+ceiling(x)         向上取整 ceiling(3.475) 4
+floor(x)           向下取整 floor(3.475)  3
+trunc(x)           向0方向取整  trunc(5.99)  5  
+round(x,digits=n)  round(3.475,digits=2)  3.48
+signif(x,digits=n) signif(3.475,digits=2) 3.5
+log(x,base=n)
+exp(x)             指数函数
+cos sin tan acos asin.....
+
+统计函数
+mean(x)             平均值
+median(x)           中位数
+sd(x)               标准差
+var(x)              方差
+mad(x)              绝对中位差
+quantile(x,probs)   求分位数 probs 是[0,1]之间的概率值存成的数值向量c(.8,.6,.4,.2)分位点
+range(x)            求值域
+sum(x)
+min(x)
+max(x)
+diff(x,lag=n) 滞后差分
+scale(x,center=TRUE,scale=TRUE) 为x进行中心化(center=TRUE) 或标准化（center=TRUE,scale=TRUE）
+
+概率函数（略过，表示看不懂）
+
+字符处理函数
+nchar(x)     字符长度
+substr(x,start,stop)   substr("abcdef",2,4) <- "22222"  x"a222ef"
+grep(pattern,x,ignore.case=FALSE,fixed=FALSE) f ixed=TRUE,pattern是文本字符串，返回匹配下标 
+sub(pattern,replacement,x,ignore.case=FALSE,fixed=FALSE) fixed=TRUE,pattern是文本字符串
+strspilt(x,spilt,fixed=FALSE) y<-strspilt("abc","")  1个成分3个元素的列表"a" "b" "c"
+paste(...,sep="")   连接字符串，分隔符sep paste("x",1:3,sep="M") c("xM1","xM2","xM3")
+toupper(x)
+tolower(x)
+
+其他实用函数
+length(x)
+seq(from,to,by) 生成序列
+rep(x,n)        repeat
+cut(x,n)        将连续型变量x分割为有着n个水平的因子 选型ordered_result= TRUE 创建一个有序型因子
+pretty(x,n)     创建美观的分割点 分为n个区间
+cat(...,file="myfile",append=TRUE)  连接...对象（用空格分开），并假期输出到屏幕或文件（如果声明了一个的话） 
+
+apply() 将函数应用到矩阵，数组，数据框的任何维度上
+apply(x, MARGIN,FUN,...) MARGIN 维度下标 1：行 2：列
+
+直方图：hist(x) 连续型变量 breaks freq
+点图：dotchart(x,labels=)
+
+基本统计分析
+描述性统计分析：
+sumary()  min max 1st Qu median 3rd Qu mean
+
+sapply(x,FUN,options)
+
+分组计算描述性统计量：aggregate()
