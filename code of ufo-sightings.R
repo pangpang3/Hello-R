@@ -24,6 +24,16 @@ get.location <- function(l){
 city.state <- lapply(ufo$Location,get.location) #lapply list-apply
 location.matrix <- do.call(rbind,city.state) # similary with apply  do.call apply for list
 ufo <- transform(ufo,USCity=location.marix[,1],USState=tolower(location.marix[,2]),stringAsFactors =FALSE)
-us.states <- c("ak","")
+us.states <- c("ak","") # need to complete this part
 ufo$USState <- us.states[match(ufo$USState,us.states)]
 ufo$USCity[is.na(ufo$USState)] <-NA
+ufo.us <-subset(ufo, !is.na(USState))
+
+quick.hist <- ggplot(ufo.us,aes(x=DateOccurred)) +geom_histogram()+scale_x_date(major="50 years")
+ggsave(plot=quick.hist,filename="../images/quick_hist.png",height=6, width=8)
+ufo.us <- subset(ufo.us, DateOccurred >= as.Date("1990-01-01"))
+nrow(ufo.us)
+
+ufo.us$YearMonth <- strftime(ufo.us.DateOccurred, format="%Y-%m")
+sightings.counts <- ddply(ufo.us,.(USState,YearMonth),nrow)
+head(sightings.counts)
