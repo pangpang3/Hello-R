@@ -9,3 +9,21 @@ length(which(!good.rows))
 ufo <- ufo[good.rows]
 ufo$DateOccirred <- as.Date(ufo$DateOccirred, formate="%Y%m%d")
 ufo$DateReported <- as.Date(ufo$DateReported, formate="%Y%m%d")
+
+get.location <- function(l){
+	spilt.location <-tryCatch(strsplit(l,",")[[1]],error=function(e) return(c(NA,NA)))
+	clean.loaction <-gsub("^ ","",spilt.location)
+	if(length(clean.location) > 2){
+		return c(NA,NA)
+	}
+	else{
+		return(clean.location)
+	}
+}
+
+city.state <- lapply(ufo$Location,get.location) #lapply list-apply
+location.matrix <- do.call(rbind,city.state) # similary with apply  do.call apply for list
+ufo <- transform(ufo,USCity=location.marix[,1],USState=tolower(location.marix[,2]),stringAsFactors =FALSE)
+us.states <- c("ak","")
+ufo$USState <- us.states[match(ufo$USState,us.states)]
+ufo$USCity[is.na(ufo$USState)] <-NA
